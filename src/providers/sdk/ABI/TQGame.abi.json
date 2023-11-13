@@ -1,0 +1,434 @@
+{
+  "name": "TQGame",
+  "desc": "",
+  "methods": [
+    {
+      "name": "createApplication",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "updateApplication",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "MANAGER_updateAdminData",
+      "args": [
+        {
+          "name": "manager",
+          "type": "address",
+          "desc": ""
+        },
+        {
+          "name": "claimer",
+          "type": "address",
+          "desc": ""
+        },
+        {
+          "name": "helper",
+          "type": "address",
+          "desc": ""
+        },
+        {
+          "name": "beacon",
+          "type": "application",
+          "desc": ""
+        },
+        {
+          "name": "gauntlet",
+          "type": "application",
+          "desc": ""
+        },
+        {
+          "name": "backgrounds",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "creaturesT1",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "creaturesT2",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "creaturesT3",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "creaturesT4",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "creaturesT5",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "CLAIMER_updateEarnings",
+      "args": [
+        {
+          "name": "raffleAsset",
+          "type": "asset",
+          "desc": ""
+        },
+        {
+          "name": "raffleAmount",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "fund",
+      "args": [
+        {
+          "name": "address",
+          "type": "address",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_donate",
+      "args": [
+        {
+          "name": "amount",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_prepareAction",
+      "args": [
+        {
+          "name": "type",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "primary",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "secondary",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "battleAssets",
+      "args": [
+        {
+          "name": "randomBytes",
+          "type": "byte[]",
+          "desc": ""
+        },
+        {
+          "name": "attacker",
+          "type": "asset",
+          "desc": ""
+        },
+        {
+          "name": "defender",
+          "type": "asset",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "(uint64,uint64)",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_commenceAction",
+      "args": [
+        {
+          "name": "choice",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_spendCreaturePoints",
+      "args": [
+        {
+          "name": "bonusPower",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "bonusAgility",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "bonusGuard",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "bonusInsight",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_summonCreature",
+      "args": [
+        {
+          "name": "slot",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "destroy",
+          "type": "bool",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_desummonCreature",
+      "args": [
+        {
+          "name": "slot",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_claimCard",
+      "args": [
+        {
+          "name": "slot",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_storeCard",
+      "args": [
+        {
+          "name": "slot",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_claimGold",
+      "args": [
+        {
+          "name": "amount",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_storeGold",
+      "args": [
+        {
+          "name": "address",
+          "type": "address",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_createCreatureBox",
+      "args": [
+        {
+          "name": "slot",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "price",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_claimCreatureBox",
+      "args": [
+        {
+          "name": "asset",
+          "type": "asset",
+          "desc": ""
+        },
+        {
+          "name": "slot",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_tradeGems",
+      "args": [
+        {
+          "name": "buy",
+          "type": "bool",
+          "desc": ""
+        },
+        {
+          "name": "tier",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "amount",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "PLAYER_registerForGauntlet",
+      "args": [
+        {
+          "name": "slot",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "index",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "GAUNTLET_resolve",
+      "args": [
+        {
+          "name": "asset",
+          "type": "asset",
+          "desc": ""
+        },
+        {
+          "name": "place",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    }
+  ]
+}

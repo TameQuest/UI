@@ -1,0 +1,78 @@
+{
+  "name": "TQGauntlet",
+  "desc": "",
+  "methods": [
+    {
+      "name": "createApplication",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "updateApplication",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "MANAGER_updateAdminData",
+      "args": [
+        {
+          "name": "manager",
+          "type": "address",
+          "desc": ""
+        },
+        {
+          "name": "beacon",
+          "type": "application",
+          "desc": ""
+        },
+        {
+          "name": "game",
+          "type": "application",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
+      "name": "registerCreature",
+      "args": [
+        {
+          "name": "slot",
+          "type": "uint64",
+          "desc": ""
+        },
+        {
+          "name": "creature",
+          "type": "asset",
+          "desc": ""
+        }
+      ],
+      "desc": "",
+      "returns": {
+        "type": "uint64",
+        "desc": ""
+      }
+    },
+    {
+      "name": "updateGauntlet",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    }
+  ]
+}
