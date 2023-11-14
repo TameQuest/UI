@@ -1,6 +1,6 @@
 import algosdk from 'algosdk'
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import TameQuestSDK from '../sdk'
+import TameQuestSDK, { LOGIC_SIG_ADDRESS } from '../sdk'
 import { PlayerState } from 'providers/sdk/types'
 import { GauntletState } from 'providers/sdk/GauntletContract'
 import { GameState } from 'providers/sdk/GameContract'
@@ -99,12 +99,18 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
   }
 
   function update(_sdk: TameQuestSDK, address?: string) {
+    dispatch(ActionTypes.UPDATE_DATA, { key: 'loading', value: true })
+    const promises = [
+      _sdk.game.updatePlayerState().then(() => setPlayerExists(true)),
+      _sdk.game.updateState(),
+      _sdk.gauntlet.updateState()
+    ]
     if (address) {
-      updateBalance(address)
+      promises.push(updateBalance(address))
     }
-    _sdk.game.updatePlayerState().then(() => setPlayerExists(true))
-    _sdk.game.updateState()
-    _sdk.gauntlet.updateState()
+    Promise.all(promises).finally(() => {
+      dispatch(ActionTypes.UPDATE_DATA, { key: 'loading', value: false })
+    })
   }
 
   function periodicalUpdates(
@@ -147,30 +153,48 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
     signedTransactions: { txID: string; blob: Uint8Array }[],
     loadingMessage: string,
     successMessage: string,
-    callback?: () => void
+    callback?: () => void,
+    silent?: boolean
   ): Promise<void> {
-    toast.promise(
-      new Promise<void>((resolve, reject) => {
-        client
-          .sendRawTransaction(signedTransactions.map((tx) => tx.blob))
-          .do()
-          .catch(reject)
-          .then(() => {
-            algosdk
-              .waitForConfirmation(client, signedTransactions[0].txID, 30)
-              .then(() => {
-                if (callback) callback()
-                update(sdk, state.account || '')
-                resolve()
-              })
-              .catch(reject)
-          })
-      }),
-      {
-        success: successMessage,
-        error: (e: any) => e.toString(),
-        loading: loadingMessage
-      }
+    dispatch(ActionTypes.UPDATE_DATA, { key: 'loading', value: true })
+    toast
+      .promise(
+        new Promise<void>((resolve, reject) => {
+          client
+            .sendRawTransaction(signedTransactions.map((tx) => tx.blob))
+            .do()
+            .catch(reject)
+            .then(() => {
+              algosdk
+                .waitForConfirmation(client, signedTransactions[0].txID, 30)
+                .then(() => {
+                  if (callback) callback()
+                  update(sdk, state.account || '')
+                  resolve()
+                })
+                .catch(reject)
+            })
+        }),
+        {
+          success: successMessage,
+          error: (e: any) => {
+            if (silent) return ''
+            const errorMessage = e.toString()
+            if (errorMessage.includes('pc=862'))
+              return 'The goddess has not made her choice yet. Try again in a couple seconds!'
+            return e.toString()
+          },
+          loading: loadingMessage
+        }
+      )
+      .finally(() => {
+        dispatch(ActionTypes.UPDATE_DATA, { key: 'loading', value: false })
+      })
+  }
+
+  function isLogicSig(transaction: algosdk.Transaction): boolean {
+    return (
+      algosdk.encodeAddress(transaction.from.publicKey) === LOGIC_SIG_ADDRESS
     )
   }
 
@@ -178,7 +202,19 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
     const signedGroups = []
     if (transactions.length > 0) {
       for (const group of transactions) {
-        const signed = await StateActions.SIGN_TRANSACTIONS(group)
+        if (group.length > 1) algosdk.assignGroupID(group)
+        const nonLogicSigTransactions = group.filter((tx) => !isLogicSig(tx))
+        const signedNonLogicSigTransactions =
+          await StateActions.SIGN_TRANSACTIONS(nonLogicSigTransactions)
+        const signed: { txID: string; blob: Uint8Array }[] = []
+        let index = 0
+        group.forEach((tx) => {
+          if (isLogicSig(tx)) signed.push(sdk.signLogicSigTransaction(tx))
+          else {
+            signed.push(signedNonLogicSigTransactions[index])
+            index += 1
+          }
+        })
         signedGroups.push(signed)
       }
     }

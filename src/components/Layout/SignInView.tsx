@@ -84,7 +84,10 @@ export const SignInView: React.FC = () => {
           )}
         </h1>
       </div>
-      <Card className="w-72 shadow-md hover:shadow-lg" background={paper}>
+      <Card
+        className="aspect-[2/3] w-72 shadow-md hover:shadow-lg"
+        background={paper}
+      >
         <div
           className="z-10 flex h-full flex-col items-center justify-between p-8"
           style={{ height: 400 }}
@@ -95,7 +98,7 @@ export const SignInView: React.FC = () => {
           >
             {!!addressHash && <Avatar seed={addressHash} />}
           </div>
-          <div className="space-y-3">
+          <div className="gap-3">
             <Input
               value={formPassword}
               onChange={setFormPassword}
@@ -114,11 +117,8 @@ export const SignInView: React.FC = () => {
                 onEnter={onSubmit}
               />
             )}
-            <div className="flex justify-center pt-6">
-              <Button
-                disabled={!validPassword || state.loading}
-                onClick={onSubmit}
-              >
+            <div className="flex justify-center pb-2 pt-6">
+              <Button disabled={!validPassword} onClick={onSubmit}>
                 {state.passwordSet ? 'Sign in' : 'Create account'}
               </Button>
             </div>

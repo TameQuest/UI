@@ -26,6 +26,7 @@ const Card: React.FC<CardProps> = ({
         (!disabled && onClick ? ' cursor-pointer' : '') +
         ` ${className || ''}`
       }
+      style={{ minWidth: 320 }}
     >
       <img className="absolute z-0" src={background} />
       {children}

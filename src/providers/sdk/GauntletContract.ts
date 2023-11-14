@@ -27,6 +27,17 @@ const GauntletStateKeys: Record<
   gd: ['drawRound', decodeNumber]
 }
 
+const defaultGauntletState: GauntletState = {
+  manager: '',
+  beacon: 0,
+  game: 0,
+  id: 0,
+  timestamp: 0,
+  stage: 0,
+  match: 0,
+  drawRound: 0
+}
+
 export default class GauntletContract extends Contract<GauntletState> {
   constructor(
     client: algosdk.Algodv2,
@@ -38,5 +49,6 @@ export default class GauntletContract extends Contract<GauntletState> {
     super(client, applicationId, abi, player, onGauntletStateUpdate)
 
     this.stateKeys = GauntletStateKeys
+    this.state = defaultGauntletState
   }
 }

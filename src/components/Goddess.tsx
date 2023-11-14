@@ -14,10 +14,10 @@ const goddessMapping = [electra, lumina, sonus, chronis]
 
 const Goddess: FC<GoddessProps> = ({ id, animated }) => {
   return (
-    <div className="h-full w-full overflow-hidden max-h-full max-w-full">
+    <div className="w-full max-w-full overflow-hidden">
       <img
         src={goddessMapping[id]}
-        className="h-auto pointer-events-none w-full overflow-hidden"
+        className="pointer-events-none h-auto w-full overflow-hidden"
       />
     </div>
   )

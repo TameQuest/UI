@@ -25,6 +25,10 @@
   --text-color-dark: #fbfbff;
 }
 
+.text-stroke {
+  text-shadow: #000 0 0 5px;
+}
+
 body {
   font-family: 'Abel', sans-serif;
   margin: 0;
@@ -77,6 +81,14 @@ body:not(.dark) {
 img,
 button {
   user-select: none;
+}
+
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
 }
 
 body:not(.dark) h1,

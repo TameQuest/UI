@@ -1,11 +1,25 @@
 import React from 'react'
-import wood from '../../assets/images/ui/backgrounds/wood_horizontal.png'
+import wood from '../../assets/images/ui/backgrounds/wood_vertical.png'
+import { useNavigate } from 'react-router-dom'
+import Button from 'components/Button'
+import Card from 'components/Card'
 
 export const SettingsView: React.FC = () => {
+  const navigate = useNavigate()
+
   return (
-    <div className="relative flex w-full max-w-screen-lg items-center justify-around">
-      <div>settings</div>
-      <img src={wood} className="absolute z-0" />
+    <div className="relative flex">
+      <Card background={wood}>
+        <div className="flex flex-col space-y-12 p-8">
+          <Button onClick={() => navigate('/settings/fund')}>
+            Fund account
+          </Button>
+
+          <Button onClick={() => navigate('/settings/backup/export')}>
+            Export backup
+          </Button>
+        </div>
+      </Card>
     </div>
   )
 }

@@ -1,28 +1,33 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Avatar from 'components/Avatar'
 import SettingsButton from './SettingsButton'
 import banner from '../../../assets/images/ui/decor/banner3.png'
 import IconButton from 'components/IconButton'
+import home from '../../../assets/images/icons/home.png'
 import battle from '../../../assets/images/icons/battle.png'
 import staging from '../../../assets/images/icons/stage.png'
 import auctions from '../../../assets/images/icons/auctions.png'
 import raffle from '../../../assets/images/icons/raffle.png'
 import gauntlet from '../../../assets/images/icons/gauntlet.png'
 import { FaLock } from 'react-icons/fa'
-import { useStore, StateActions } from 'providers/store'
+import { useStore, StateActions, ActionTypes } from 'providers/store'
 import { weakHash } from 'utils'
 import { useAccount } from 'providers/AccountProvider'
 
 const Navbar: React.FC = () => {
+  const navigate = useNavigate()
   const { state, dispatch } = useStore()
   const { playerExists, player } = useAccount()
-
   const signOut = () => {
     StateActions.SIGN_OUT(dispatch)
   }
 
   const validPlayer = playerExists && player.society !== 4
+
+  const toggleBag = () => {
+    dispatch(ActionTypes.UPDATE_DATA, { key: 'showBag', value: !state.showBag })
+  }
 
   return (
     <nav className="pointer-events-none z-30 p-2 transition-all md:p-4">
@@ -37,21 +42,42 @@ const Navbar: React.FC = () => {
         </div>
         {validPlayer && (
           <div className="pointer-events-auto flex space-x-8">
-            <Link to="/battle">
-              <IconButton className="h-20 w-20" icon={battle} />
-            </Link>
-            <Link to="/staging">
-              <IconButton className="h-20 w-20" icon={staging} />
-            </Link>
-            <Link to="/auctions">
-              <IconButton className="h-20 w-20" icon={auctions} />
-            </Link>
-            <Link to="/raffle">
-              <IconButton className="h-20 w-20" icon={raffle} />
-            </Link>
-            <Link to="/gauntlet">
-              <IconButton className="h-20 w-20" icon={gauntlet} />
-            </Link>
+            <IconButton
+              className="h-20 w-20"
+              icon={home}
+              onClick={() => navigate('/')}
+              selected={location.pathname === '/'}
+            />
+            <IconButton
+              className="h-20 w-20"
+              icon={battle}
+              onClick={() => navigate('/battle')}
+              selected={location.pathname === '/battle'}
+            />
+            <IconButton
+              className="h-20 w-20"
+              icon={staging}
+              onClick={() => navigate('/staging')}
+              selected={location.pathname === '/staging'}
+            />
+            <IconButton
+              className="h-20 w-20"
+              icon={auctions}
+              onClick={() => navigate('/auctions')}
+              selected={location.pathname === '/auctions'}
+            />
+            <IconButton
+              className="h-20 w-20"
+              icon={raffle}
+              onClick={() => navigate('/raffle')}
+              selected={location.pathname === '/raffle'}
+            />
+            <IconButton
+              className="h-20 w-20"
+              icon={gauntlet}
+              onClick={() => navigate('/gauntlet')}
+              selected={location.pathname === '/gauntlet'}
+            />
           </div>
         )}
         <div className="pointer-events-auto top-4 flex items-center space-x-4">
@@ -60,13 +86,16 @@ const Navbar: React.FC = () => {
           </IconButton>
           {validPlayer && state.account && (
             <>
-              <Link to="/settings" className="h-16 w-16">
-                <SettingsButton />
-              </Link>
-              <div className="relative h-20 w-20 cursor-pointer transition-all hover:scale-95 hover:opacity-90 active:scale-90">
+              <div className="h-16 w-16">
+                <SettingsButton onClick={() => navigate('/settings')} />
+              </div>
+              <button
+                onClick={toggleBag}
+                className="relative h-20 w-20 cursor-pointer transition-all hover:scale-95 active:scale-90"
+              >
                 <Avatar seed={weakHash(state.account)} />
                 <img className="absolute top-6 z-0 scale-75" src={banner} />
-              </div>
+              </button>
             </>
           )}
         </div>

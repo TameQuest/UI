@@ -82,7 +82,7 @@ export const FundAccountView: React.FC = () => {
               />
               <button
                 onClick={() => setAmount(maxAmount.toString())}
-                className="font-cinzel rounded bg-black px-2 py-1 font-mono font-bold transition-all hover:scale-95 active:scale-90"
+                className="rounded bg-black px-2 py-1 font-mono font-bold transition-all hover:scale-95 active:scale-90"
               >
                 max
               </button>
@@ -90,7 +90,6 @@ export const FundAccountView: React.FC = () => {
             <Button
               onClick={fundPlayer}
               disabled={
-                state.loading ||
                 Number.isNaN(Number.parseFloat(amount)) ||
                 Number.parseFloat(amount) > maxAmount ||
                 maxAmount <= 0.002

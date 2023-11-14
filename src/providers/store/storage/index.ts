@@ -228,7 +228,6 @@ export async function signTransactions(
     if (!sk) {
       toast.error('Account not found.')
     }
-    if (group.length > 1) algosdk.assignGroupID(group)
     return group.map((txn: algosdk.Transaction) =>
       algosdk.signTransaction(txn, sk)
     )

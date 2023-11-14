@@ -27,6 +27,8 @@ interface State {
   backupDownloaded: boolean
   passwordSet: boolean
   signedIn: boolean
+  creatureReceived: boolean
+  showBag: boolean
   loading: boolean
   account?: string
 }
@@ -35,12 +37,15 @@ const initialState: State = {
   backupDownloaded: false,
   passwordSet: false,
   signedIn: false,
+  creatureReceived: false,
+  showBag: false,
   loading: false
 }
 
 export const LocalStorageKeys = {
   ADDRESS_SEED: 'addressSeed',
-  ACCOUNT_BACKED_UP: 'accountBackedUp'
+  ACCOUNT_BACKED_UP: 'accountBackedUp',
+  CREATURE_RECEIVED: 'creatureReceived'
 }
 
 export const ActionTypes = {
@@ -87,7 +92,10 @@ interface StoreProviderProps {
 const initializeStore = (): State => {
   return {
     ...initialState,
-    backupDownloaded: !!localStorage.getItem(LocalStorageKeys.ACCOUNT_BACKED_UP)
+    backupDownloaded: !!localStorage.getItem(
+      LocalStorageKeys.ACCOUNT_BACKED_UP
+    ),
+    creatureReceived: !!localStorage.getItem(LocalStorageKeys.CREATURE_RECEIVED)
   }
 }
 

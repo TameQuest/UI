@@ -13,6 +13,7 @@ import {
   StateKeyValue,
   SummonedCreature
 } from './types'
+import { LOGIC_SIG_ADDRESS } from '.'
 
 export type GameState = {
   manager: string
@@ -108,6 +109,90 @@ const parseCreatureInfo = (
   }
 }
 
+const createHelperTransaction = (
+  suggestedParams: algosdk.SuggestedParams
+): algosdk.Transaction => {
+  return algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+    from: LOGIC_SIG_ADDRESS,
+    to: LOGIC_SIG_ADDRESS,
+    amount: 0,
+    suggestedParams: {
+      ...suggestedParams,
+      flatFee: true,
+      fee: 2000
+    }
+  })
+}
+
+const defaultGameState: GameState = {
+  manager: '',
+  claimer: '',
+  helper: '',
+  lastClaimed: 0,
+  beacon: 0,
+  gauntlet: 0,
+  raffleAsset: 0,
+  raffleAmount: 0,
+  goldAsset: 0,
+  cardsReserves: [0, 0, 0, 0, 0],
+  cardsLiquidity: [0, 0, 0, 0, 0],
+  backgroundsAmount: 0,
+  creaturesAmounts: [0, 0, 0, 0, 0],
+  donations: [0, 0, 0, 0],
+  gauntletBonus: 0,
+  totalFunds: 0,
+  totalGold: 0,
+  totalBattles: 0
+}
+
+const defaultPlayerState: PlayerState = {
+  society: 0,
+  activity: {
+    type: 0,
+    drawRound: 0,
+    primary: 0,
+    secondary: 0
+  },
+  totalBattles: 0,
+  funds: 0,
+  gold: 0,
+  donations: 0,
+  summonedCreature: {
+    info: {
+      difficulty: 0,
+      tier: 0,
+      background: 0,
+      creature: 0,
+      power: 0,
+      agility: 0,
+      guard: 0,
+      insight: 0
+    },
+    id: 0,
+    stage: 0,
+    battles: 0,
+    points: 0,
+    bonus: 0,
+    penalty: 0,
+    gauntlet: {
+      id: 0,
+      place: 0
+    }
+  },
+  battleCreature: {
+    difficulty: 0,
+    tier: 0,
+    background: 0,
+    creature: 0,
+    power: 0,
+    agility: 0,
+    guard: 0,
+    insight: 0
+  },
+  gems: [0, 0, 0, 0, 0],
+  bag: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+}
+
 export default class GameContract extends Contract<GameState> {
   playerState: PlayerState
   onPlayerStateUpdate?: (playerState: PlayerState) => void
@@ -123,7 +208,8 @@ export default class GameContract extends Contract<GameState> {
     super(client, applicationId, abi, player, onGameStateUpdate)
 
     this.stateKeys = GameStateKeys
-    this.playerState = {} as PlayerState
+    this.state = defaultGameState
+    this.playerState = defaultPlayerState
     this.onPlayerStateUpdate = onPlayerStateUpdate
   }
 
@@ -183,9 +269,6 @@ export default class GameContract extends Contract<GameState> {
     creaturesT4: number,
     creaturesT5: number
   ): Promise<algosdk.Transaction[]> => {
-    const suggestedParams = await this.getSuggestedParams()
-    suggestedParams.flatFee = true
-    suggestedParams.fee = 2000
     return await this.makeMethodCall({
       method: this.abi.getMethodByName('MANAGER_updateAdminData'),
       methodArgs: [
@@ -201,7 +284,11 @@ export default class GameContract extends Contract<GameState> {
         creaturesT4,
         creaturesT5
       ],
-      suggestedParams
+      suggestedParams: {
+        ...(await this.getSuggestedParams()),
+        flatFee: true,
+        fee: 2000
+      }
     })
   }
 
@@ -209,13 +296,14 @@ export default class GameContract extends Contract<GameState> {
     raffleAsset: number,
     raffleAmount: number
   ): Promise<algosdk.Transaction[]> => {
-    const suggestedParams = await this.getSuggestedParams()
-    suggestedParams.flatFee = true
-    suggestedParams.fee = 3000
     return await this.makeMethodCall({
       method: this.abi.getMethodByName('CLAIMER_updateEarnings'),
       methodArgs: [raffleAsset, raffleAmount],
-      suggestedParams
+      suggestedParams: {
+        ...(await this.getSuggestedParams()),
+        flatFee: true,
+        fee: 3000
+      }
     })
   }
 
@@ -223,7 +311,11 @@ export default class GameContract extends Contract<GameState> {
     address: string,
     amount: number
   ): Promise<algosdk.Transaction[]> => {
-    const suggestedParams = await this.getSuggestedParams()
+    const suggestedParams = {
+      ...(await this.getSuggestedParams()),
+      flatFee: true,
+      fee: 1000
+    }
     return [
       algosdk.makePaymentTxnWithSuggestedParamsFromObject({
         from: this.player,
@@ -246,18 +338,25 @@ export default class GameContract extends Contract<GameState> {
   }
 
   PLAYER_donate = async (amount: number): Promise<algosdk.Transaction[]> => {
-    const suggestedParams = await this.getSuggestedParams()
-    return await this.makeMethodCall({
-      method: this.abi.getMethodByName('PLAYER_donate'),
-      methodArgs: [amount],
-      boxes: [
-        {
-          name: algosdk.decodeAddress(this.player).publicKey,
-          appIndex: this.application
-        }
-      ],
-      suggestedParams
-    })
+    const suggestedParams = {
+      ...(await this.getSuggestedParams()),
+      flatFee: true,
+      fee: 0
+    }
+    return [
+      ...(await this.makeMethodCall({
+        method: this.abi.getMethodByName('PLAYER_donate'),
+        methodArgs: [amount],
+        boxes: [
+          {
+            name: algosdk.decodeAddress(this.player).publicKey,
+            appIndex: this.application
+          }
+        ],
+        suggestedParams
+      })),
+      createHelperTransaction(suggestedParams)
+    ]
   }
 
   // eGjvZw==
@@ -266,27 +365,37 @@ export default class GameContract extends Contract<GameState> {
     primary: number,
     secondary: number
   ): Promise<algosdk.Transaction[]> => {
-    const suggestedParams = await this.getSuggestedParams()
-    return await this.makeMethodCall({
-      method: this.abi.getMethodByName('PLAYER_prepareAction'),
-      methodArgs: [type, primary, secondary],
-      boxes: [
-        {
-          name: algosdk.decodeAddress(this.player).publicKey,
-          appIndex: this.application
-        }
-      ],
-      suggestedParams
-    })
+    const suggestedParams = {
+      ...(await this.getSuggestedParams()),
+      flatFee: true,
+      fee: 0
+    }
+    return [
+      ...(await this.makeMethodCall({
+        method: this.abi.getMethodByName('PLAYER_prepareAction'),
+        methodArgs: [type, primary, secondary],
+        boxes: [
+          {
+            name: algosdk.decodeAddress(this.player).publicKey,
+            appIndex: this.application
+          }
+        ],
+        suggestedParams
+      })),
+      createHelperTransaction(suggestedParams)
+    ]
   }
 
   // YOZugQ==
   PLAYER_commenceAction = async (
     choice: number
   ): Promise<algosdk.Transaction[]> => {
-    const suggestedParams = await this.getSuggestedParams()
+    const suggestedParams = {
+      ...(await this.getSuggestedParams()),
+      flatFee: true,
+      fee: 0
+    }
     await this.updateState()
-
     const boxes = [
       {
         name: algosdk.decodeAddress(this.player).publicKey,
@@ -317,13 +426,16 @@ export default class GameContract extends Contract<GameState> {
         }
       )
     }
-    return await this.makeMethodCall({
-      method: this.abi.getMethodByName('PLAYER_commenceAction'),
-      methodArgs: [choice],
-      boxes,
-      appForeignApps: [this.state.beacon],
-      suggestedParams
-    })
+    return [
+      ...(await this.makeMethodCall({
+        method: this.abi.getMethodByName('PLAYER_commenceAction'),
+        methodArgs: [choice],
+        boxes,
+        appForeignApps: [this.state.beacon],
+        suggestedParams
+      })),
+      createHelperTransaction(suggestedParams)
+    ]
   }
 
   // nH/E4A==
@@ -333,55 +445,76 @@ export default class GameContract extends Contract<GameState> {
     bonusGuard: number,
     bonusInsight: number
   ): Promise<algosdk.Transaction[]> => {
-    const suggestedParams = await this.getSuggestedParams()
-    return await this.makeMethodCall({
-      method: this.abi.getMethodByName('PLAYER_spendCreaturePoints'),
-      methodArgs: [bonusPower, bonusAgility, bonusGuard, bonusInsight],
-      boxes: [
-        {
-          name: algosdk.decodeAddress(this.player).publicKey,
-          appIndex: this.application
-        }
-      ],
-      suggestedParams
-    })
+    const suggestedParams = {
+      ...(await this.getSuggestedParams()),
+      flatFee: true,
+      fee: 0
+    }
+    return [
+      ...(await this.makeMethodCall({
+        method: this.abi.getMethodByName('PLAYER_spendCreaturePoints'),
+        methodArgs: [bonusPower, bonusAgility, bonusGuard, bonusInsight],
+        boxes: [
+          {
+            name: algosdk.decodeAddress(this.player).publicKey,
+            appIndex: this.application
+          }
+        ],
+        suggestedParams
+      })),
+      createHelperTransaction(suggestedParams)
+    ]
   }
 
   PLAYER_summonCreature = async (
     slot: number,
     destroy: boolean
   ): Promise<algosdk.Transaction[]> => {
-    const suggestedParams = await this.getSuggestedParams()
+    const suggestedParams = {
+      ...(await this.getSuggestedParams()),
+      flatFee: true,
+      fee: 0
+    }
     await this.updatePlayerState()
-    return await this.makeMethodCall({
-      method: this.abi.getMethodByName('PLAYER_summonCreature'),
-      methodArgs: [slot, destroy],
-      boxes: [
-        {
-          name: algosdk.decodeAddress(this.player).publicKey,
-          appIndex: this.application
-        }
-      ],
-      appForeignAssets: [this.playerState.bag[slot]],
-      suggestedParams
-    })
+    return [
+      ...(await this.makeMethodCall({
+        method: this.abi.getMethodByName('PLAYER_summonCreature'),
+        methodArgs: [slot, destroy],
+        boxes: [
+          {
+            name: algosdk.decodeAddress(this.player).publicKey,
+            appIndex: this.application
+          }
+        ],
+        appForeignAssets: [this.playerState.bag[slot]],
+        suggestedParams
+      })),
+      createHelperTransaction(suggestedParams)
+    ]
   }
 
   PLAYER_desummonCreature = async (
     slot: number
   ): Promise<algosdk.Transaction[]> => {
-    const suggestedParams = await this.getSuggestedParams()
-    return await this.makeMethodCall({
-      method: this.abi.getMethodByName('PLAYER_desummonCreature'),
-      methodArgs: [slot],
-      boxes: [
-        {
-          name: algosdk.decodeAddress(this.player).publicKey,
-          appIndex: this.application
-        }
-      ],
-      suggestedParams
-    })
+    const suggestedParams = {
+      ...(await this.getSuggestedParams()),
+      flatFee: true,
+      fee: 0
+    }
+    return [
+      ...(await this.makeMethodCall({
+        method: this.abi.getMethodByName('PLAYER_desummonCreature'),
+        methodArgs: [slot],
+        boxes: [
+          {
+            name: algosdk.decodeAddress(this.player).publicKey,
+            appIndex: this.application
+          }
+        ],
+        suggestedParams
+      })),
+      createHelperTransaction(suggestedParams)
+    ]
   }
 
   PLAYER_tradeGems = async (
@@ -389,17 +522,24 @@ export default class GameContract extends Contract<GameState> {
     tier: number,
     amount: number
   ): Promise<algosdk.Transaction[]> => {
-    const suggestedParams = await this.getSuggestedParams()
-    return await this.makeMethodCall({
-      method: this.abi.getMethodByName('PLAYER_tradeGems'),
-      methodArgs: [buy, tier, amount],
-      boxes: [
-        {
-          name: algosdk.decodeAddress(this.player).publicKey,
-          appIndex: this.application
-        }
-      ],
-      suggestedParams
-    })
+    const suggestedParams = {
+      ...(await this.getSuggestedParams()),
+      flatFee: true,
+      fee: 0
+    }
+    return [
+      ...(await this.makeMethodCall({
+        method: this.abi.getMethodByName('PLAYER_tradeGems'),
+        methodArgs: [buy, tier, amount],
+        boxes: [
+          {
+            name: algosdk.decodeAddress(this.player).publicKey,
+            appIndex: this.application
+          }
+        ],
+        suggestedParams
+      })),
+      createHelperTransaction(suggestedParams)
+    ]
   }
 }

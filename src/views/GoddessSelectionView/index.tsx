@@ -4,6 +4,7 @@ import electra from 'assets/goddesses/electra.svg'
 import lumina from 'assets/goddesses/lumina.svg'
 import sonus from 'assets/goddesses/sonus.svg'
 import chronis from 'assets/goddesses/chronis.svg'
+import paper from 'assets/images/ui/backgrounds/paper_horizontal.png'
 import { GoddessColumn } from './GoddessColumn'
 import { classNames } from 'utils'
 import Button from 'components/Button'
@@ -12,6 +13,8 @@ import electra_loop from 'assets/sound/electra.mp3'
 import lumina_loop from 'assets/sound/lumina.mp3'
 import sonus_loop from 'assets/sound/sonus.mp3'
 import chronis_loop from 'assets/sound/chronis.mp3'
+import Modal from 'components/Modal'
+import { useAccount } from 'providers/AccountProvider'
 
 const paragraphs = {
   [electra]: [
@@ -51,8 +54,17 @@ const paragraphs = {
   ]
 }
 
+const goddessMapping: Record<string, number> = {
+  Electra: 0,
+  Lumina: 1,
+  Sonus: 2,
+  Chronis: 3
+}
+
 export const GoddessSelectionView: React.FC = () => {
+  const { sdk, signTransactions, sendTransactions } = useAccount()
   const [selected, setSelected] = useState<string | undefined>()
+  const [modalOpen, setModalOpen] = useState(false)
 
   const select = (goddess: string) => () => {
     setSelected(goddess)
@@ -62,8 +74,42 @@ export const GoddessSelectionView: React.FC = () => {
     setSelected(undefined)
   }
 
+  const openModal = () => {
+    setModalOpen(true)
+  }
+
+  const choose = async () => {
+    if (selected && Object.keys(goddessMapping).includes(selected)) {
+      const signed = await signTransactions([
+        await sdk.game.PLAYER_commenceAction(goddessMapping[selected])
+      ])
+      sendTransactions(
+        signed[0],
+        `Pleding allegiance to ${selected}...`,
+        'Your choice was accepted!'
+      )
+    }
+  }
+
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center gap-4">
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <div className="relative flex justify-center">
+          <div className="z-10 flex flex-col items-center justify-center space-y-6 p-4 text-center">
+            <div className="w-80 pb-4">
+              <h1 className="font-fantasy text-stroke text-3xl font-bold">
+                Are you sure?
+              </h1>
+              <div className="rounded-lg bg-black bg-opacity-80 p-2 font-bold">
+                Deity choice is permanent. You will not be able to change your
+                allegiance afterwards.
+              </div>
+            </div>
+            <Button onClick={choose}>Choose {selected}</Button>
+          </div>
+          <img className="absolute z-0" src={paper} />
+        </div>
+      </Modal>
       <div
         className={classNames('absolute top-8 z-20', !selected && 'opacity-0')}
       >
@@ -83,6 +129,7 @@ export const GoddessSelectionView: React.FC = () => {
           name={'Electra'}
           title={'The pulsing heartbeat of Energy'}
           onSelect={select('Electra')}
+          onChoice={openModal}
           selected={selected}
           paragraphs={paragraphs[electra]}
           sound={electra_loop}
@@ -92,6 +139,7 @@ export const GoddessSelectionView: React.FC = () => {
           name={'Lumina'}
           title={'The radiant beacon of Light'}
           onSelect={select('Lumina')}
+          onChoice={openModal}
           selected={selected}
           paragraphs={paragraphs[lumina]}
           sound={lumina_loop}
@@ -101,6 +149,7 @@ export const GoddessSelectionView: React.FC = () => {
           name={'Sonus'}
           title={'The harmonious whisper of Sound'}
           onSelect={select('Sonus')}
+          onChoice={openModal}
           selected={selected}
           paragraphs={paragraphs[sonus]}
           sound={sonus_loop}
@@ -110,6 +159,7 @@ export const GoddessSelectionView: React.FC = () => {
           name={'Chronis'}
           title={'The ever-ticking mistress of Time'}
           onSelect={select('Chronis')}
+          onChoice={openModal}
           selected={selected}
           paragraphs={paragraphs[chronis]}
           sound={chronis_loop}

@@ -9,6 +9,10 @@ const DEFAULT_NODE_HOST = 'https://testnet-api.algonode.cloud'
 const DEFAULT_NODE_PORT = 443
 export const DEFAULT_GAME_APP_ID = 468475198
 export const DEFAULT_GAUNTLET_APP_ID = 468342034
+export const LOGIC_SIG_ADDRESS =
+  'BMUDVDWBLSCTFXAQ6VRGXNUTWZARIV4I3IEPQR4ODRO3NYRSKQOWXJMUZA'
+export const LOGIC_SIG_CODE =
+  'CSABATEgMgMSRDEJMgMSRDEQIhJEMQcxABJEMQGB0A8SRDIEgQISRDMAGIG+urHfARJEIg=='
 
 export type TameQuestSDKConfig = {
   client?: algosdk.Algodv2
@@ -49,7 +53,7 @@ export default class TameQuestSDK {
     )
   }
 
-  async playerExists(): Promise<boolean> {
+  playerExists = (): Promise<boolean> => {
     return new Promise((resolve, reject) =>
       this.client
         .getApplicationBoxByName(
@@ -64,6 +68,16 @@ export default class TameQuestSDK {
           if (e.status === 404) return resolve(false)
           else reject('Something went wrong while looking up player box.')
         })
+    )
+  }
+
+  signLogicSigTransaction = (txn: algosdk.Transaction) => {
+    return algosdk.signLogicSigTransaction(
+      txn,
+      new algosdk.LogicSigAccount(
+        new Uint8Array(Buffer.from(LOGIC_SIG_CODE, 'base64')),
+        []
+      )
     )
   }
 }

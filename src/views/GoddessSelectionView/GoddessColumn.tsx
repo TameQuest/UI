@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { FaVolumeMute, FaVolumeOff, FaVolumeUp } from 'react-icons/fa'
 import useSound from 'use-sound'
 import { classNames } from 'utils'
+import paper from 'assets/images/ui/backgrounds/paper.png'
 
 type GoddessColumnProps = {
   image: string
@@ -10,6 +11,7 @@ type GoddessColumnProps = {
   title: string
   selected?: string
   onSelect?: () => void
+  onChoice?: () => void
   paragraphs: string[]
   sound: string
 }
@@ -20,6 +22,7 @@ export const GoddessColumn: React.FC<GoddessColumnProps> = ({
   title,
   selected,
   onSelect,
+  onChoice,
   paragraphs,
   sound
 }) => {
@@ -51,7 +54,7 @@ export const GoddessColumn: React.FC<GoddessColumnProps> = ({
   return (
     <div
       className={classNames(
-        'group/goddess flex flex-col items-center transition-all hover:w-[133%]',
+        'group/goddess flex flex-col h-full items-center transition-all hover:w-[133%]',
         selected === name
           ? ''
           : 'grayscale hover:grayscale-0 opacity-80 hover:opacity-100',
@@ -77,19 +80,17 @@ export const GoddessColumn: React.FC<GoddessColumnProps> = ({
         </div>
       )}
       {selected === name && (
-        <div className="font-smooth flex max-w-screen-md flex-col items-center justify-center gap-4 py-8 text-lg">
-          <button
-            onClick={togglePlay}
-            className="flex items-center space-x-8 text-4xl"
-          >
-            <div className="hover:opacity-80">
+        <div className="flex max-w-screen-md flex-col items-center justify-center gap-4 py-8 text-lg">
+          <div className="flex items-center space-x-8 pb-8 text-4xl">
+            <button className="hover:opacity-80" onClick={togglePlay}>
               {play ? <FaVolumeUp /> : <FaVolumeMute />}
-            </div>
-            <Button>Choose {name}</Button>
-          </button>
-          <div></div>
+            </button>
+            <Button onClick={onChoice}>Choose {name}</Button>
+          </div>
           {paragraphs.map((text, i) => (
-            <p key={`p-${i}`}>{text}</p>
+            <p key={`p-${i}`} className="font-smooth indent-8">
+              {text}
+            </p>
           ))}
         </div>
       )}
