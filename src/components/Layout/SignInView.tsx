@@ -98,7 +98,7 @@ export const SignInView: React.FC = () => {
           >
             {!!addressHash && <Avatar seed={addressHash} />}
           </div>
-          <div className="gap-3">
+          <div className="space-y-3">
             <Input
               value={formPassword}
               onChange={setFormPassword}
