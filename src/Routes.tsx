@@ -1,9 +1,7 @@
 import React, { FC, useEffect, useState } from 'react'
 import { Routes as BrowserRoutes, Route, useNavigate } from 'react-router-dom'
 import { LandingView } from 'views/LandingView'
-import { BattleResultView } from 'views/BattleView/Result'
 import { BattleView } from 'views/BattleView'
-import StageView from 'views/StagingView'
 import { StageResultView } from 'views/StagingView/Result'
 import { RaffleView } from 'views/RaffleView'
 import { RaffleResultView } from 'views/RaffleView/Result'
@@ -24,6 +22,7 @@ import { getGoddessName } from 'utils'
 import Card from 'components/Card'
 import wood from 'assets/images/ui/backgrounds/wood_vertical.png'
 import Button from 'components/Button'
+import { StagingView } from 'views/StagingView'
 
 const Routes: FC = () => {
   const { state, dispatch } = useStore()
@@ -81,8 +80,8 @@ const Routes: FC = () => {
           <>
             <Route index element={<LandingView />} />
             <Route path="/battle" element={<BattleView />} />
-            <Route path="/battle/:tx" element={<BattleResultView />} />
-            <Route path="/staging" element={<StageView />} />
+            <Route path="/battle/:tx" element={<BattleView />} />
+            <Route path="/staging" element={<StagingView />} />
             <Route path="/staging/:tx" element={<StageResultView />} />
             <Route path="/raffle" element={<RaffleView />} />
             <Route path="/raffle/:tx" element={<RaffleResultView />} />

@@ -19,12 +19,17 @@ import Card from 'components/Card'
 import Button from 'components/Button'
 import { formatAmount } from 'utils'
 import { CreatureCard } from 'components/CreatureCard'
+import { PlayerActivity, SummonedCreature } from 'providers/sdk/types'
 
 const gemImages = [gem1, gem2, gem3, gem4, gem5]
 
 export const Bag: React.FC = () => {
   const { state, dispatch } = useStore()
-  const { player } = useAccount()
+  const { player, signTransactions, sendTransactions, sdk } = useAccount()
+  const [selectedSlot, setSelectedSlot] = useState<number | undefined>(0)
+  const [selectedCreature, setSelectedCreature] = useState<
+    SummonedCreature | undefined
+  >()
   const [position, setPosition] = useState({
     x: 50,
     y: window.innerHeight - 650
@@ -33,6 +38,39 @@ export const Bag: React.FC = () => {
   const closeDialog = () => {
     dispatch(ActionTypes.UPDATE_DATA, { key: 'showBag', value: false })
   }
+
+  const getFreeSlot = () => {
+    return player.bag.findIndex((s) => s === 0)
+  }
+
+  const summon = async () => {
+    const signedTransactions = await signTransactions([
+      await sdk.game.PLAYER_summonCreature(selectedSlot || 0, false)
+    ])
+    sendTransactions(
+      signedTransactions[0],
+      'Summoning creature...',
+      'Creature has been summoned!'
+    )
+  }
+
+  const desummon = async () => {
+    const signedTransactions = await signTransactions([
+      await sdk.game.PLAYER_desummonCreature(getFreeSlot())
+    ])
+    sendTransactions(
+      signedTransactions[0],
+      'Desummoning creature...',
+      'Creature has been put in your bag!'
+    )
+  }
+
+  const selectCreature = (slot: number) => (creature: SummonedCreature) => {
+    setSelectedSlot(slot)
+    setSelectedCreature(creature)
+  }
+
+  const creatureSummoned = player.summonedCreature.info.power !== 0
 
   return (
     <div className="pointer-events-none absolute z-50 h-full w-full">
@@ -45,15 +83,43 @@ export const Bag: React.FC = () => {
           <div className="pointer-events-auto relative flex aspect-[7/5] max-w-max cursor-pointer items-center justify-center">
             <div className="z-10 flex items-start justify-between space-x-4 p-8">
               <div className="items-start justify-start">
-                <CreatureCard creature={player.summonedCreature} />
-                <div className="flex w-full justify-center pt-4">
-                  <Button>Desummon</Button>
-                </div>
+                <CreatureCard
+                  creature={selectedCreature || player.summonedCreature}
+                />
+                {(selectedCreature || creatureSummoned) && (
+                  <div className="flex w-full justify-center space-x-4 pt-4">
+                    <Button
+                      disabled={
+                        player.activity.type !== PlayerActivity.none ||
+                        (selectedCreature && creatureSummoned)
+                      }
+                      onClick={selectedCreature ? summon : desummon}
+                    >
+                      {selectedCreature ? 'Summon' : 'Desummon'}
+                    </Button>
+                    {selectedCreature && (
+                      <button
+                        className=" transition-all hover:scale-95 active:scale-90"
+                        onClick={() => {
+                          setSelectedSlot(undefined)
+                          setSelectedCreature(undefined)
+                        }}
+                      >
+                        <img src={cross} className="h-8 w-8" />
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="flex flex-col items-end justify-start space-y-2 p-4">
                 <div className="grid grid-cols-4 gap-2 rounded-lg p-2">
                   {player.bag.map((slot, i) => (
-                    <BagSlot key={`slot-${i}`} id={i} asset={slot} />
+                    <BagSlot
+                      key={`slot-${i}`}
+                      id={i}
+                      asset={slot}
+                      onSelect={selectCreature(i)}
+                    />
                   ))}
                 </div>
                 <div className="grid w-full grid-cols-5 gap-2 rounded-lg p-2">

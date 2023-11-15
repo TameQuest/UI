@@ -1,24 +1,12 @@
-import AccountName from 'components/AccountName'
 import Button from 'components/Button'
-import Card from 'components/Card'
-import { CreatureCard } from 'components/CreatureCard'
 import Goddess from 'components/Goddess'
 import Input from 'components/Input'
 import { useAccount } from 'providers/AccountProvider'
-import { useStore } from 'providers/store'
 import React, { useState } from 'react'
-import {
-  FaBolt,
-  FaCoins,
-  FaFeatherAlt,
-  FaLightbulb,
-  FaShieldAlt
-} from 'react-icons/fa'
+import { FaCoins } from 'react-icons/fa'
 import { formatAmount, getGoddessName } from 'utils'
-import wood from 'assets/images/ui/backgrounds/bg.png'
 
 export const LandingView: React.FC = () => {
-  const { state } = useStore()
   const { sdk, signTransactions, sendTransactions, player, game } = useAccount()
 
   const [amount, setAmount] = useState('5000')

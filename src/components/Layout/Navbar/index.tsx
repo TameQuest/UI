@@ -80,18 +80,18 @@ const Navbar: React.FC = () => {
             />
           </div>
         )}
-        <div className="pointer-events-auto top-4 flex items-center space-x-4">
+        <div className="pointer-events-auto top-4 flex items-start space-x-4">
           <IconButton className="h-16 w-16" onClick={signOut}>
             <FaLock className="text-black opacity-60" />
           </IconButton>
           {validPlayer && state.account && (
             <>
-              <div className="h-16 w-16">
+              <div className="w-24 py-4">
                 <SettingsButton onClick={() => navigate('/settings')} />
               </div>
               <button
                 onClick={toggleBag}
-                className="relative h-20 w-20 cursor-pointer transition-all hover:scale-95 active:scale-90"
+                className="relative w-20 cursor-pointer transition-all hover:scale-95 active:scale-90"
               >
                 <Avatar seed={weakHash(state.account)} />
                 <img className="absolute top-6 z-0 scale-75" src={banner} />

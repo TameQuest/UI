@@ -60,7 +60,7 @@ export const Traits: React.FC<TraitsProps> = ({ bonus, penalty }) => {
 
   return (
     <div className="absolute top-[5%] z-20 flex w-[80%] justify-center rounded-lg">
-      {bonusStat !== 4 && (
+      {bonus > 4 && bonusStat !== 4 && (
         <Label
           stat={bonusStat}
           name={bonusName}
@@ -68,7 +68,7 @@ export const Traits: React.FC<TraitsProps> = ({ bonus, penalty }) => {
           positive
         />
       )}
-      {penaltyStat !== 4 && (
+      {penalty > 4 && penaltyStat !== 4 && (
         <Label
           stat={penaltyStat}
           name={penaltyName}

@@ -10,13 +10,25 @@ import guard from 'assets/images/icons/guard.png'
 import insight from 'assets/images/icons/insight.png'
 import { Badge } from './Badge'
 import { Traits } from './Traits'
-import { getBackgroundImage, getCreatureImage } from 'utils'
+import { classNames, getBackgroundImage, getCreatureImage } from 'utils'
+
+import gem1 from 'assets/images/gems/full/1.png'
+import gem2 from 'assets/images/gems/full/2.png'
+import gem3 from 'assets/images/gems/full/3.png'
+import gem4 from 'assets/images/gems/full/4.png'
+import gem5 from 'assets/images/gems/full/5.png'
+
+const gems = [gem1, gem2, gem3, gem4, gem5]
 
 type CreatureCardProps = {
   creature: SummonedCreature
+  enemy?: boolean
 }
 
-export const CreatureCard: React.FC<CreatureCardProps> = ({ creature }) => {
+export const CreatureCard: React.FC<CreatureCardProps> = ({
+  creature,
+  enemy
+}) => {
   const backgroundImage = getBackgroundImage(creature.info.background)
   const creatureImage = getCreatureImage(
     creature.info.tier,
@@ -41,26 +53,41 @@ export const CreatureCard: React.FC<CreatureCardProps> = ({ creature }) => {
     if (bonusStat === stat) {
       return Math.floor((bonusPercentage * baseStat) / 100)
     } else if (penaltyStat === stat) {
-      return Math.floor(penaltyPercentage * baseStat)
+      return -Math.floor((penaltyPercentage * baseStat) / 100)
     }
     return 0
   }
 
   return (
     <div
-      className={
-        'relative z-10 inline-flex aspect-[2/3] items-center justify-center rounded transition-all disabled:cursor-not-allowed disabled:opacity-60'
-      }
+      className={classNames(
+        'relative z-10 inline-flex aspect-[2/3] items-center justify-center rounded transition-all',
+        stats[0] === 0 && 'grayscale opacity-30'
+      )}
       style={{ width: 320 }}
     >
       <img className="absolute z-20" src={front} />
-      <div className="absolute -top-[5%] z-10 flex w-full items-center justify-center">
+      <div
+        className={classNames(
+          'absolute -top-[5%] z-10 flex w-full items-center justify-center',
+          enemy && '-scale-x-100'
+        )}
+      >
         <img src={creatureImage} />
       </div>
-      <div className="absolute bottom-[33%] z-10 flex w-[40%] items-center justify-center">
-        <span className="absolute rounded bg-black px-2 pb-1 text-sm font-bold opacity-80">
-          #{creature.id}
-        </span>
+      <div
+        className={classNames(
+          'absolute flex w-[40%] items-center justify-center',
+          enemy ? '-top-[5%] z-20' : 'bottom-[33%] z-10'
+        )}
+      >
+        {enemy ? (
+          <img src={gems[creature.info.tier]} className="w-16" />
+        ) : (
+          <span className="absolute rounded bg-black px-2 pb-1 text-sm font-bold opacity-80">
+            #{creature.id}
+          </span>
+        )}
       </div>
       <img className="absolute top-[3%] z-0 rounded-lg" src={backgroundImage} />
       <Traits bonus={creature.bonus} penalty={creature.penalty} />

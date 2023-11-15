@@ -24,7 +24,7 @@ const Star: React.FC<StarProps> = ({ className, filled }) => {
       >
         <img src={star} className="p-2" />
       </div>
-      <img src={emptyStar} className="absolute z-10 shadow-lg" />
+      <img src={emptyStar} className="absolute z-10" />
     </div>
   )
 }

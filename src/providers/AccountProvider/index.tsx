@@ -23,8 +23,10 @@ type AccountContextType = {
     signedTransactions: { txID: string; blob: Uint8Array }[],
     loadingMessage: string,
     successMessage: string,
-    callback?: () => void
-  ) => Promise<void>
+    successCallback?: (txID?: string) => void,
+    errorCallback?: () => void,
+    silent?: boolean
+  ) => Promise<void | void[]>
 }
 
 function getDefaultAccountContext(): AccountContextType {
@@ -153,43 +155,51 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
     signedTransactions: { txID: string; blob: Uint8Array }[],
     loadingMessage: string,
     successMessage: string,
-    callback?: () => void,
+    successCallback?: (txId?: string) => void,
+    errorCallback?: () => void,
     silent?: boolean
-  ): Promise<void> {
+  ): Promise<void | void[]> {
     dispatch(ActionTypes.UPDATE_DATA, { key: 'loading', value: true })
-    toast
-      .promise(
-        new Promise<void>((resolve, reject) => {
-          client
-            .sendRawTransaction(signedTransactions.map((tx) => tx.blob))
-            .do()
-            .catch(reject)
+    const promise = new Promise<void>((resolve, reject) => {
+      client
+        .sendRawTransaction(signedTransactions.map((tx) => tx.blob))
+        .do()
+        .catch(reject)
+        .then(({ txId }) => {
+          algosdk
+            .waitForConfirmation(client, txId, 5)
             .then(() => {
-              algosdk
-                .waitForConfirmation(client, signedTransactions[0].txID, 30)
-                .then(() => {
-                  if (callback) callback()
-                  update(sdk, state.account || '')
-                  resolve()
-                })
-                .catch(reject)
+              if (successCallback) successCallback(txId)
+              update(sdk, state.account || '')
+              resolve()
             })
-        }),
-        {
-          success: successMessage,
-          error: (e: any) => {
-            if (silent) return ''
-            const errorMessage = e.toString()
-            if (errorMessage.includes('pc=862'))
-              return 'The goddess has not made her choice yet. Try again in a couple seconds!'
-            return e.toString()
-          },
-          loading: loadingMessage
-        }
-      )
-      .finally(() => {
-        dispatch(ActionTypes.UPDATE_DATA, { key: 'loading', value: false })
-      })
+            .catch(() => {
+              reject()
+              if (errorCallback) errorCallback()
+            })
+        })
+    })
+    return silent
+      ? promise
+          .then()
+          .catch()
+          .finally(() => {
+            dispatch(ActionTypes.UPDATE_DATA, { key: 'loading', value: false })
+          })
+      : toast
+          .promise(promise, {
+            success: successMessage,
+            error: (e: any) => {
+              const errorMessage = e.toString()
+              if (errorMessage.includes('pc=862'))
+                return 'The goddess has not made her choice yet. Try again in a couple seconds!'
+              return e.toString()
+            },
+            loading: loadingMessage
+          })
+          .finally(() => {
+            dispatch(ActionTypes.UPDATE_DATA, { key: 'loading', value: false })
+          })
   }
 
   function isLogicSig(transaction: algosdk.Transaction): boolean {
