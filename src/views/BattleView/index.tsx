@@ -418,7 +418,7 @@ export const BattleView: React.FC = () => {
   const isOnAdventure = player.activity.type === PlayerActivity.battle
   const isTaming = player.activity.type === PlayerActivity.taming
 
-  const displayCreatureInfo: SummonedCreature = isTaming
+  const displayCreatureInfo: SummonedCreature | undefined = isTaming
     ? {
         info: player.battleCreature,
         id: 0,
@@ -651,7 +651,10 @@ export const BattleView: React.FC = () => {
         )}
         {isTaming ? (
           <div className="flex h-full flex-col items-center justify-start space-y-8">
-            <CreatureCard creature={displayCreatureInfo} enemy />
+            <CreatureCard
+              creature={displayCreatureInfo || player.summonedCreature}
+              enemy
+            />
             <div className="animate-pulse opacity-80">
               Creature is being tamed...
             </div>
